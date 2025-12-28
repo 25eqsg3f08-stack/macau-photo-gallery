@@ -2,95 +2,163 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>分享照片 - 邮件发送</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>澳门内港照片集</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { padding: 20px; font-family: Arial, sans-serif; background: #f5f5f5; }
-        .container { max-width: 500px; margin: 0 auto; background: #fff; padding: 25px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
-        h2 { text-align: center; margin-bottom: 20px; color: #333; }
-        .preview { text-align: center; margin-bottom: 20px; }
-        .preview img { max-width: 100%; border-radius: 8px; max-height: 300px; object-fit: contain; }
-        .form-group { margin-bottom: 15px; }
-        label { display: block; margin-bottom: 5px; font-size: 14px; color: #666; }
-        input, textarea { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; }
-        textarea { height: 120px; resize: vertical; }
-        .btn-group { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
-        button { padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; font-size: 14px; }
-        #cancel { background: #eee; color: #666; }
-        #send { background: #2196F3; color: #fff; }
+        body { 
+            padding: 10px; 
+            font-family: Arial, Helvetica, sans-serif; 
+            background-color: #f5f5f5;
+        }
+        h1 { 
+            text-align: center; 
+            margin-bottom: 15px; 
+            color: #333;
+            font-size: 20px;
+        }
+        .loading { 
+            text-align: center; 
+            padding: 15px; 
+            font-size: 14px; 
+            color: #666;
+        }
+        #map { 
+            height: 200px; 
+            border-radius: 8px; 
+            margin: 15px 0; 
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .photo-view { 
+            text-align: center; 
+            margin: 20px 0; 
+            position: relative;
+        }
+        .photo-view img { 
+            max-width: 100%; 
+            max-height: 60vh; 
+            border-radius: 8px; 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            object-fit: contain;
+        }
+        .photo-info { 
+            margin: 10px 0; 
+            font-size: 14px; 
+            color: #666;
+        }
+        .controls { 
+            display: flex; 
+            justify-content: center; 
+            gap: 10px; 
+            margin: 20px 0; 
+            flex-wrap: wrap;
+        }
+        .controls button, .print-setting button { 
+            padding: 10px 20px; 
+            border: none; 
+            border-radius: 20px; 
+            background: #2196F3; 
+            color: #fff; 
+            cursor: pointer;
+            font-size: 14px;
+            min-width: 80px;
+        }
+        .controls button:disabled, .print-setting button:disabled { 
+            background: #ccc; 
+            cursor: not-allowed; 
+        }
+        #error { 
+            text-align: center; 
+            padding: 15px; 
+            color: #e53935; 
+            display: none;
+            background: #ffebee;
+            border-radius: 8px;
+            margin: 10px 0;
+        }
+        /* 打印设置区域样式 */
+        .print-setting {
+            max-width: 500px;
+            margin: 20px auto;
+            padding: 15px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .print-setting h3 {
+            font-size: 16px;
+            color: #333;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        .print-setting .form-group {
+            margin-bottom: 10px;
+        }
+        .print-setting label {
+            display: block;
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 4px;
+        }
+        .print-setting input, .print-setting textarea, .print-setting select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        .print-setting textarea {
+            height: 60px;
+            resize: vertical;
+        }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h2>分享澳门内港照片</h2>
-        <!-- 图片预览 -->
-        <div class="preview">
-            <img id="preview-img" src="" alt="照片预览">
-        </div>
-        <!-- 邮件表单 -->
-        <div class="form-group">
-            <label for="title">邮件标题</label>
-            <input type="text" id="title" placeholder="请输入邮件标题">
-        </div>
-        <div class="form-group">
-            <label for="sender">发送人</label>
-            <input type="text" id="sender" placeholder="你的名字/邮箱">
-        </div>
-        <div class="form-group">
-            <label for="receiver">收件人邮箱</label>
-            <input type="email" id="receiver" placeholder="对方的邮箱地址">
-        </div>
-        <div class="form-group">
-            <label for="content">邮件内容</label>
-            <textarea id="content" placeholder="请输入分享的话语..."></textarea>
-        </div>
-        <div class="btn-group">
-            <button id="cancel">取消</button>
-            <button id="send">发送邮件</button>
-        </div>
+    <h1>澳门内港照片集</h1>
+    <div class="loading">正在加载图片...</div>
+    <div id="error"></div>
+    <div id="map"></div>
+
+    <!-- 图片展示与控制 -->
+    <div class="photo-view">
+        <img id="current-photo" src="" alt="暂无图片" style="display: none;">
+        <div class="photo-info" id="photo-info">0 / 0</div>
+    </div>
+    <div class="controls">
+        <button id="prev-btn" disabled>上一个</button>
+        <button id="next-btn" disabled>下一个</button>
+        <button id="print-btn" disabled>打印预览</button>
+        <button id="mail-btn" disabled>分享邮件</button>
     </div>
 
+    <!-- 打印参数设置区域 -->
+    <div class="print-setting" id="print-setting" style="display: none;">
+        <h3>打印参数设置</h3>
+        <div class="form-group">
+            <label for="print-title">打印标题</label>
+            <input type="text" id="print-title" placeholder="澳门内港照片">
+        </div>
+        <div class="form-group">
+            <label for="print-size">图片打印尺寸</label>
+            <select id="print-size">
+                <option value="original">实际大小</option>
+                <option value="50%">50% 缩放</option>
+                <option value="75%">75% 缩放</option>
+                <option value="120%">120% 缩放</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="print-content">附加内容</label>
+            <textarea id="print-content" placeholder="可添加照片说明、拍摄地点等内容..."></textarea>
+        </div>
+        <button id="to-preview">前往预览</button>
+    </div>
+
+    <script src="map.js"></script>
+    <script src="script.js"></script>
     <script>
-        // 获取 URL 参数
-        const urlParams = new URLSearchParams(window.location.search);
-        const imgUrl = decodeURIComponent(urlParams.get("imgUrl") || "");
-        const imgName = decodeURIComponent(urlParams.get("imgName") || "澳门内港照片");
-
-        // 初始化页面
-        window.onload = function() {
-            const previewImg = document.getElementById("preview-img");
-            const titleInput = document.getElementById("title");
-            const contentInput = document.getElementById("content");
-
-            // 填充预览图和默认内容
-            if (imgUrl) previewImg.src = imgUrl;
-            titleInput.value = `分享照片：${imgName}`;
-            contentInput.value = `你好，分享一张澳门内港的照片给你：\n${imgUrl}`;
-
-            // 取消按钮：关闭窗口
-            document.getElementById("cancel").addEventListener("click", () => {
-                window.close();
-            });
-
-            // 发送按钮：调用系统邮件客户端
-            document.getElementById("send").addEventListener("click", () => {
-                const title = encodeURIComponent(titleInput.value);
-                const sender = encodeURIComponent(document.getElementById("sender").value);
-                const receiver = document.getElementById("receiver").value;
-                const content = encodeURIComponent(contentInput.value);
-
-                if (!receiver) {
-                    alert("请输入收件人邮箱！");
-                    return;
-                }
-
-                // 拼接 mailto 链接
-                const mailtoUrl = `mailto:${receiver}?subject=${title}&from=${sender}&body=${content}`;
-                window.location.href = mailtoUrl;
-                alert("已唤起邮件客户端，确认发送即可！");
-            });
-        };
-    </script>
-</body>
-</html>
+        // 打印按钮点击逻辑（新增）
+        const printBtn = document.getElementById("print-btn");
+    
