@@ -2,7 +2,7 @@
 const CACHE_CONFIG = {
     CORE: {
         NAME: "core-cache-v1.0.0",
-        ASSETS: ["/", "index.html", "mail.html", "mail.js", "app.js"]
+        ASSETS: ["/macau-photo-gallery/", "/macau-photo-gallery/index.html", "/macau-photo-gallery/mail.html", "/macau-photo-gallery/mail.js", "/macau-photo-gallery/app.js"]
     },
     IMG: {
         NAME: "img-cache-v1.0.0",
