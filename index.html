@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>澳门内港照片集</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            padding: 20px; 
+            font-family: Arial, sans-serif; 
+            background: #f8f9fa;
+        }
+        /* 标题样式 */
+        .main-title { 
+            text-align: center; 
+            margin-bottom: 25px; 
+            color: #212529;
+            font-size: 24px;
+            font-weight: 600;
+        }
+        .loading { 
+            text-align: center; 
+            padding: 15px; 
+            font-size: 16px; 
+            color: #6c757d;
+            margin-bottom: 20px;
+        }
+        #error { 
+            text-align: center; 
+            padding: 15px; 
+            color: #dc3545; 
+            display: none;
+            background: #f8d7da;
+            border-radius: 8px;
+            margin: 20px 0;
+            font-size: 16px;
+        }
+        /* 图片展示区 */
+        .photo-view { 
+            text-align: center; 
+            margin: 30px 0; 
+            min-height: 400px; 
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .photo-view img { 
+            max-width: 100%; 
+            max-height: 50vh; 
+            border-radius: 8px; 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            object-fit: contain;
+        }
+        .photo-info { 
+            margin: 20px 0; 
+            font-size: 18px; 
+            color: #495057;
+            font-weight: 500;
+        }
+        /* 上下切换按钮 */
+        .nav-btns { 
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-bottom: 30px;
+        }
+        .nav-btns button { 
+            padding: 12px 30px; 
+            border: none; 
+            border-radius: 8px; 
+            background: #007bff; 
+            color: #fff; 
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .nav-btns button:disabled { 
+            background: #6c757d; 
+            cursor: not-allowed; 
+        }
+        /* 打印设置面板（核心定制项） */
+        #print-setting {
+            max-width: 400px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        #print-setting h3 {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 18px;
+            color: #212529;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 14px;
+            color: #6c757d;
+        }
+        .form-group input, .form-group textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        .form-group textarea {
+            height: 60px;
+            resize: vertical;
+        }
+        #to-preview {
+            width: 100%;
+            padding: 10px;
+            border: none;
+            border-radius: 4px;
+            background: #28a745;
+            color: #fff;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <!-- 核心标题（可直接修改文本） -->
+    <h1 class="main-title">澳门内港照片集</h1>
+    <div class="loading" id="loading">正在加载图片...</div>
+    <div id="error"></div>
+
+    <!-- 图片展示 -->
+    <div class="photo-view">
+        <img id="current-photo" src="" alt="照片" style="display: none;">
+        <div class="photo-info" id="photo-info">0 / 0</div>
+    </div>
+
+    <!-- 仅保留上一个、下一个按钮 -->
+    <div class="nav-btns">
+        <button id="prev-btn" disabled>上一个</button>
+        <button id="next-btn" disabled>下一个</button>
+    </div>
+
+    <!-- 打印设置：仅标题、内容、图片尺寸输入 -->
+    <div id="print-setting">
+        <h3>打印参数设置</h3>
+        <div class="form-group">
+            <label for="print-title">打印标题</label>
+            <input type="text" id="print-title" placeholder="输入打印标题">
+        </div>
+        <div class="form-group">
+            <label for="print-content">打印内容</label>
+            <textarea id="print-content" placeholder="输入附加内容"></textarea>
+        </div>
+        <div class="form-group">
+            <label for="print-size">图片尺寸（百分比/像素，如50%/400px）</label>
+            <input type="text" id="print-size" placeholder="例如：100% 或 500px" value="100%">
+        </div>
+        <button id="to-preview">前往打印预览</button>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
