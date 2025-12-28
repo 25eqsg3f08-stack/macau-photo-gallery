@@ -3,56 +3,94 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>澳门街道照片 - 打印页面</title>
-    <link rel="stylesheet" href="print.css">
+    <title>分享照片 - 邮件发送</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { padding: 20px; font-family: Arial, sans-serif; background: #f5f5f5; }
+        .container { max-width: 500px; margin: 0 auto; background: #fff; padding: 25px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        h2 { text-align: center; margin-bottom: 20px; color: #333; }
+        .preview { text-align: center; margin-bottom: 20px; }
+        .preview img { max-width: 100%; border-radius: 8px; max-height: 300px; object-fit: contain; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-size: 14px; color: #666; }
+        input, textarea { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; }
+        textarea { height: 120px; resize: vertical; }
+        .btn-group { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
+        button { padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; font-size: 14px; }
+        #cancel { background: #eee; color: #666; }
+        #send { background: #2196F3; color: #fff; }
+    </style>
 </head>
 <body>
-    <div class="print-container">
-        <!-- 打印配置区 -->
-        <div class="config-panel">
-            <div class="form-group">
-                <label>标题 <span class="required">*</span>：</label>
-                <input type="text" id="print-title" placeholder="输入照片标题" required>
-            </div>
-            <div class="form-group">
-                <label>内容 <span class="required">*</span>：</label>
-                <textarea id="print-content" placeholder="输入照片描述" required></textarea>
-            </div>
-            <div class="form-group">
-                <label>日期 <span class="required">*</span>：</label>
-                <input type="date" id="print-date" required>
-            </div>
-            <div class="form-group">
-                <label>图片尺寸（宽×高 px） <span class="required">*</span>：</label>
-                <div class="size-input">
-                    <input type="number" id="img-width" placeholder="宽" min="100" value="600" required>
-                    <span>×</span>
-                    <input type="number" id="img-height" placeholder="高" min="100" value="400" required>
-                </div>
-            </div>
-            <button id="apply-config">应用设置</button>
-            <button id="print-btn">打印当前页面</button>
+    <div class="container">
+        <h2>分享澳门内港照片</h2>
+        <!-- 图片预览 -->
+        <div class="preview">
+            <img id="preview-img" src="" alt="照片预览">
         </div>
-
-        <!-- 图片与内容展示区（打印核心区域） -->
-        <div class="print-content">
-            <h1 id="show-title">照片标题</h1>
-            <div class="meta-info">
-                <span id="show-date">2025-12-28</span>
-            </div>
-            <div class="img-wrapper">
-                <img id="print-img" alt="澳门街道照片">
-            </div>
-            <div class="show-content" id="show-content">照片描述内容...</div>
+        <!-- 邮件表单 -->
+        <div class="form-group">
+            <label for="title">邮件标题</label>
+            <input type="text" id="title" placeholder="请输入邮件标题">
         </div>
-
-        <!-- 图片切换按钮 -->
-        <div class="nav-buttons">
-            <button id="prev-img">上一张</button>
-            <button id="next-img">下一张</button>
+        <div class="form-group">
+            <label for="sender">发送人</label>
+            <input type="text" id="sender" placeholder="你的名字/邮箱">
+        </div>
+        <div class="form-group">
+            <label for="receiver">收件人邮箱</label>
+            <input type="email" id="receiver" placeholder="对方的邮箱地址">
+        </div>
+        <div class="form-group">
+            <label for="content">邮件内容</label>
+            <textarea id="content" placeholder="请输入分享的话语..."></textarea>
+        </div>
+        <div class="btn-group">
+            <button id="cancel">取消</button>
+            <button id="send">发送邮件</button>
         </div>
     </div>
 
-    <script src="print.js"></script>
+    <script>
+        // 获取 URL 参数
+        const urlParams = new URLSearchParams(window.location.search);
+        const imgUrl = decodeURIComponent(urlParams.get("imgUrl") || "");
+        const imgName = decodeURIComponent(urlParams.get("imgName") || "澳门内港照片");
+
+        // 初始化页面
+        window.onload = function() {
+            const previewImg = document.getElementById("preview-img");
+            const titleInput = document.getElementById("title");
+            const contentInput = document.getElementById("content");
+
+            // 填充预览图和默认内容
+            if (imgUrl) previewImg.src = imgUrl;
+            titleInput.value = `分享照片：${imgName}`;
+            contentInput.value = `你好，分享一张澳门内港的照片给你：\n${imgUrl}`;
+
+            // 取消按钮：关闭窗口
+            document.getElementById("cancel").addEventListener("click", () => {
+                window.close();
+            });
+
+            // 发送按钮：调用系统邮件客户端
+            document.getElementById("send").addEventListener("click", () => {
+                const title = encodeURIComponent(titleInput.value);
+                const sender = encodeURIComponent(document.getElementById("sender").value);
+                const receiver = document.getElementById("receiver").value;
+                const content = encodeURIComponent(contentInput.value);
+
+                if (!receiver) {
+                    alert("请输入收件人邮箱！");
+                    return;
+                }
+
+                // 拼接 mailto 链接
+                const mailtoUrl = `mailto:${receiver}?subject=${title}&from=${sender}&body=${content}`;
+                window.location.href = mailtoUrl;
+                alert("已唤起邮件客户端，确认发送即可！");
+            });
+        };
+    </script>
 </body>
 </html>
