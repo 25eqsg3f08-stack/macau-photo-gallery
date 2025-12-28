@@ -30,9 +30,13 @@ window.addEventListener("DOMContentLoaded", () => {
 
     // 4. 绑定按钮事件
     function bindEvents() {
-        // 取消按钮：关闭当前窗口
+        // 取消按钮：修复window.close()报错，返回上一页/主界面
         elements.cancelBtn.addEventListener("click", () => {
-            window.close();
+            if (window.history.length > 1) {
+                window.history.back();
+            } else {
+                window.location.href = "./index.html";
+            }
         });
 
         // 发送按钮：唤起系统邮件客户端
