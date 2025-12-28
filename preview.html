@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>照片打印预览</title>
+    <!-- 引入打印专用样式文件 -->
+    <link rel="stylesheet" href="print.css">
+</head>
+<body>
+    <div class="print-container">
+        <!-- 打印标题 -->
+        <h1 id="preview-title"></h1>
+        <!-- 图片预览区域 -->
+        <div class="photo-preview" id="photo-preview"></div>
+        <!-- 附加内容区域 -->
+        <div class="print-content" id="print-content"></div>
+        <!-- 立即打印按钮 -->
+        <button id="print-now">立即打印</button>
+    </div>
+
+    <script>
+        // 解析URL中携带的打印参数
+        const urlParams = new URLSearchParams(window.location.search);
+        const imgUrl = decodeURIComponent(urlParams.get("imgUrl") || "");
+        const printTitle = decodeURIComponent(urlParams.get("title") || "澳门内港照片");
+        const printSize = decodeURIComponent(urlParams.get("size") || "original");
+        const printContent = decodeURIComponent(urlParams.get("content") || "");
+
+        // 页面加载完成后初始化预览内容
+        window.addEventListener("DOMContentLoaded", () => {
+            // 渲染打印标题
+            document.getElementById("preview-title").textContent = printTitle;
+            
+            // 渲染预览图片
+            const photoPreview = document.getElementById("photo-preview");
+            if (imgUrl) {
+                const img = document.createElement("img");
+                img.src = imgUrl;
+                img.alt = printTitle;
+                img.id = "preview-img";
+                // 根据选择的尺寸设置图片大小
+                if (printSize !== "original") {
+                    img.style.width = printSize;
+                    img.style.height = "auto";
+                }
+                photoPreview.appendChild(img);
+            } else {
+                photoPreview.innerHTML = "<p style='text-align:center; color:#e53935;'>暂无图片可预览</p>";
+            }
+
+            // 渲染附加内容
+            const contentEl = document.getElementById("print-content");
+            if (printContent) {
+                contentEl.textContent = printContent;
+            } else {
+                contentEl.style.display = "none"; // 无内容则隐藏区域
+            }
+
+            // 立即打印按钮事件
+            document.getElementById("print-now").addEventListener("click", () => {
+                // 触发浏览器打印功能
+                window.print();
+            });
+        });
+    </script>
+</body>
+</html>
