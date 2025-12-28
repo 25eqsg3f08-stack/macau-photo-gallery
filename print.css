@@ -1,0 +1,157 @@
+/* 全局重置 */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Microsoft YaHei", Arial, sans-serif;
+}
+
+body {
+    padding: 20px;
+    background: #f5f5f5;
+}
+
+.print-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    background: #fff;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+/* 配置面板样式 */
+.config-panel {
+    border: 1px solid #eee;
+    padding: 20px;
+    border-radius: 6px;
+    margin-bottom: 30px;
+    background: #f9f9f9;
+}
+
+.form-group {
+    margin-bottom: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.required {
+    color: #e74c3c;
+}
+
+input, textarea {
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+textarea {
+    min-height: 80px;
+    resize: vertical;
+}
+
+.size-input {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.size-input input {
+    flex: 1;
+}
+
+.config-panel button {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    background: #3498db;
+    color: #fff;
+    cursor: pointer;
+    margin-right: 10px;
+}
+
+.config-panel button:hover {
+    background: #2980b9;
+}
+
+/* 打印内容样式（打印机优先识别此区域） */
+.print-content {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+#show-title {
+    font-size: 24px;
+    margin-bottom: 10px;
+    color: #2c3e50;
+}
+
+.meta-info {
+    font-size: 14px;
+    color: #7f8c8d;
+    margin-bottom: 20px;
+}
+
+.img-wrapper {
+    margin: 0 auto;
+    border: 1px solid #ddd;
+    padding: 10px;
+    display: inline-block;
+}
+
+#print-img {
+    display: block;
+    border: none;
+}
+
+.show-content {
+    margin-top: 20px;
+    font-size: 16px;
+    line-height: 1.6;
+    color: #333;
+    text-align: left;
+    padding: 0 20px;
+}
+
+/* 导航按钮样式 */
+.nav-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+}
+
+.nav-buttons button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    background: #2ecc71;
+    color: #fff;
+    cursor: pointer;
+}
+
+.nav-buttons button:disabled {
+    background: #bdc3c7;
+    cursor: not-allowed;
+}
+
+.nav-buttons button:hover:not(:disabled) {
+    background: #27ae60;
+}
+
+/* 打印媒体查询：隐藏配置面板，优化打印效果 */
+@media print {
+    .config-panel, .nav-buttons {
+        display: none !important;
+    }
+
+    .print-container {
+        box-shadow: none;
+        padding: 0;
+    }
+
+    .img-wrapper {
+        border: none;
+    }
+}
