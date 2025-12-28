@@ -34,7 +34,7 @@
     <script>
         if ("serviceWorker" in navigator) {
             window.addEventListener("load", () => {
-                navigator.serviceWorker.register("/sw.js")
+                navigator.serviceWorker.register("/macau-photo-gallery/sw.js")
                     .then(() => console.log("SW注册成功"))
                     .catch(err => console.error("SW注册失败：", err));
             });
