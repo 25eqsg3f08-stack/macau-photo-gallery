@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>澳门街道离线图片浏览器</title>
+    <meta name="description" content="跨仓库加载图片，支持自定义缓存数量、精准清除图片缓存">
+    <link rel="stylesheet" href="/macau-photo-gallery/css/style.css">
+    <!-- 注册 Service Worker 实现离线 -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', async () => {
+                try {
+                    await navigator.serviceWorker.register('/sw.js');
+                    console.log('Service Worker 注册成功 → 离线模式已启用');
+                } catch (error) {
+                    console.error('Service Worker 注册失败:', error);
+                }
+            });
+        }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>澳门街道离线图片浏览器</h1>
+            <p>图片源: <a href="https://github.com/25eqsg3f08-stack/Rua_de_macau_Photos" target="_blank">Rua_de_macau_Photos</a> | 缓存隔离: 仅清理图片</p>
+        </header>
+
+        <!-- 图片显示区 -->
+        <div class="image-container">
+            <img id="current-image" src="https://via.placeholder.com/1200x600?text=加载中..." alt="澳门街道图片" class="street-image">
+            <div class="image-info">
+                <span id="image-name">未加载图片</span>
+                <span id="page-info">0/0</span>
+            </div>
+        </div>
+
+        <!-- 翻页控制 -->
+        <div class="control-buttons">
+            <button id="prev-btn" class="btn" disabled>上一页</button>
+            <button id="next-btn" class="btn" disabled>下一页</button>
+        </div>
+
+        <!-- 缓存控制区（核心：自定义数量 + 精准清除） -->
+        <div class="cache-settings">
+            <h3>离线缓存控制</h3>
+            <div class="cache-option">
+                <label for="cache-count">设置缓存图片数量:</label>
+                <input type="number" id="cache-count" min="1" max="500" value="20" placeholder="输入1-500的数字">
+            </div>
+            <button id="cache-btn" class="btn btn-primary">开始缓存指定数量图片</button>
+            <button id="clear-img-cache-btn" class="btn btn-danger">仅清除图片缓存（保留网页）</button>
+            <p id="cache-status">缓存状态: 未初始化</p>
+            <p id="cache-size">当前图片缓存大小: 0MB (0GB)</p>
+        </div>
+    </div>
+
+    <script src="/macau-photo-gallery/js/storage.js"></script>
+    <script src="/macau-photo-gallery/js/main.js"></script>
+</body>
+</html>
