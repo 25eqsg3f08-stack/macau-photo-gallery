@@ -1,7 +1,7 @@
 // ================= 缓存配置（无硬空间上限，动态适配）=================
 const CACHE_CONFIG = {
     CORE: {
-        NAME: "core-cache-v1.0.0",
+        NAME: "core-cache-v1.2.0",
         ASSETS: ["/macau-photo-gallery/", "/macau-photo-gallery/index.html", "/macau-photo-gallery/mail.html", "/macau-photo-gallery/mail.js", "/macau-photo-gallery/app.js"]
     },
     IMG: {
