@@ -6,21 +6,52 @@
     <title>澳门街道离线图片浏览器</title>
     <meta name="description" content="跨仓库加载图片，支持自定义缓存数量、精准清除图片缓存">
     <link rel="stylesheet" href="/macau-photo-gallery/css/style.css">
-    <!-- 注册 Service Worker 实现离线 -->
+    <!-- 注册 Service Worker 实现离线（修正路径+添加作用域） -->
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', async () => {
                 try {
-                    await navigator.serviceWorker.register('/sw.js');
-                    console.log('Service Worker 注册成功 → 离线模式已启用');
+                    // 关键：SW文件路径和作用域都要匹配子目录
+                    const swReg = await navigator.serviceWorker.register('/macau-photo-gallery/sw.js', {
+                        scope: '/macau-photo-gallery/' // 作用域必须覆盖项目路径
+                    });
+                    console.log('Service Worker 注册成功 → 离线模式已启用', swReg);
                 } catch (error) {
                     console.error('Service Worker 注册失败:', error);
                 }
             });
         }
     </script>
+    <style>
+        /* 新增：网络状态提示样式 */
+        .network-status {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 8px;
+            text-align: center;
+            font-weight: bold;
+            z-index: 9999;
+        }
+        .online {
+            background-color: #4CAF50;
+            color: white;
+        }
+        .offline {
+            background-color: #f44336;
+            color: white;
+        }
+        /* 给容器加顶部边距，避免被状态条遮挡 */
+        .container {
+            margin-top: 40px;
+        }
+    </style>
 </head>
 <body>
+    <!-- 新增：实时网络状态提示条 -->
+    <div id="network-status-bar" class="network-status online">当前网络：在线</div>
+
     <div class="container">
         <header class="header">
             <h1>澳门街道离线图片浏览器</h1>
@@ -56,6 +87,24 @@
         </div>
     </div>
 
+    <script>
+        // 新增：实时检测网络状态
+        const statusBar = document.getElementById('network-status-bar');
+        function updateNetworkStatus() {
+            if (navigator.onLine) {
+                statusBar.textContent = '当前网络：在线';
+                statusBar.className = 'network-status online';
+            } else {
+                statusBar.textContent = '当前网络：离线（仅可查看已缓存图片）';
+                statusBar.className = 'network-status offline';
+            }
+        }
+        // 初始化状态
+        updateNetworkStatus();
+        // 监听网络变化
+        window.addEventListener('online', updateNetworkStatus);
+        window.addEventListener('offline', updateNetworkStatus);
+    </script>
     <script src="/macau-photo-gallery/js/storage.js"></script>
     <script src="/macau-photo-gallery/js/main.js"></script>
 </body>
