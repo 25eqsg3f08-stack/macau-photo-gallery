@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>缓存包下载设置 - 澳门街道图片浏览器</title>
+    <link rel="stylesheet" href="/macau-photo-gallery/css/style.css">
+    <style>
+        .container {
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+        .back-link {
+            margin-bottom: 20px;
+        }
+        .back-link a {
+            color: #2196F3;
+            text-decoration: none;
+        }
+        .cache-quantity {
+            margin: 20px 0;
+        }
+        .quantity-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 15px 0;
+        }
+        .quantity-btn {
+            padding: 8px 16px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background: #f5f5f5;
+            cursor: pointer;
+        }
+        .quantity-btn.active {
+            background: #2196F3;
+            color: white;
+            border-color: #2196F3;
+        }
+        .custom-quantity {
+            margin: 15px 0;
+        }
+        .custom-quantity input {
+            width: 100px;
+            padding: 8px;
+            margin-left: 10px;
+        }
+        .cache-duration {
+            margin: 20px 0;
+        }
+        .duration-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 15px 0;
+        }
+        .duration-btn {
+            padding: 8px 16px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background: #f5f5f5;
+            cursor: pointer;
+        }
+        .duration-btn.active {
+            background: #4CAF50;
+            color: white;
+            border-color: #4CAF50;
+        }
+        .download-btn {
+            margin-top: 30px;
+            padding: 12px 30px;
+            background: #ff9800;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        .status-text {
+            margin-top: 20px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="back-link">
+            <a href="/macau-photo-gallery/index.html">← 返回图片浏览页</a>
+        </div>
+        <h2>离线缓存包下载设置</h2>
+
+        <div class="cache-quantity">
+            <h3>1. 选择缓存图片数量</h3>
+            <div class="quantity-buttons">
+                <button class="quantity-btn" data-num="10">10张</button>
+                <button class="quantity-btn" data-num="20">20张</button>
+                <button class="quantity-btn" data-num="30">30张</button>
+                <button class="quantity-btn" data-num="40">40张</button>
+                <button class="quantity-btn" data-num="60">60张</button>
+                <button class="quantity-btn" data-num="80">80张</button>
+                <button class="quantity-btn" data-num="100">100张</button>
+            </div>
+            <div class="custom-quantity">
+                <label>自定义数量：</label>
+                <input type="number" id="custom-num" min="1" max="500" placeholder="1-500">
+            </div>
+        </div>
+
+        <div class="cache-duration">
+            <h3>2. 选择缓存有效期</h3>
+            <div class="duration-options">
+                <button class="duration-btn" data-days="3">三天</button>
+                <button class="duration-btn" data-days="7">七天</button>
+                <button class="duration-btn" data-days="7">一周</button>
+                <button class="duration-btn" data-days="30">一月</button>
+                <button class="duration-btn" data-days="365">一年</button>
+                <button class="duration-btn" data-days="0">永久</button>
+            </div>
+        </div>
+
+        <button class="download-btn" id="download-cache">下载缓存包</button>
+        <p class="status-text" id="download-status">请选择缓存数量和有效期后点击下载</p>
+    </div>
+
+    <script src="/macau-photo-gallery/js/storage.js"></script>
+    <script>
+        // 选中状态管理
+        let selectedNum = 0;
+        let selectedDays = 0;
+
+        // 数量按钮点击事件
+        const quantityBtns = document.querySelectorAll('.quantity-btn');
+        quantityBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                quantityBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                selectedNum = parseInt(btn.dataset.num);
+                document.getElementById('custom-num').value = '';
+            });
+        });
+
+        // 自定义数量输入
+        const customNumInput = document.getElementById('custom-num');
+        customNumInput.addEventListener('input', () => {
+            const val = parseInt(customNumInput.value) || 0;
+            if (val >= 1 && val <= 500) {
+                quantityBtns.forEach(b => b.classList.remove('active'));
+                selectedNum = val;
+            }
+        });
+
+        // 有效期按钮点击事件
+        const durationBtns = document.querySelectorAll('.duration-btn');
+        durationBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                durationBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                selectedDays = parseInt(btn.dataset.days);
+            });
+        });
+
+        // 下载缓存包按钮事件
+        const downloadBtn = document.getElementById('download-cache');
+        const downloadStatus = document.getElementById('download-status');
+        downloadBtn.addEventListener('click', async () => {
+            if (selectedNum === 0) {
+                downloadStatus.textContent = '错误：请选择缓存图片数量';
+                return;
+            }
+            if (selectedDays === undefined) {
+                downloadStatus.textContent = '错误：请选择缓存有效期';
+                return;
+            }
+
+            downloadStatus.textContent = `正在缓存 ${selectedNum} 张图片，时效：${selectedDays === 0 ? '永久' : selectedDays + '天'}...`;
+            downloadBtn.disabled = true;
+
+            try {
+                // 获取远程图片列表（复用storage.js的逻辑）
+                const TARGET_REPO = {
+                    user: "25eqsg3f08-stack",
+                    repo: "Rua_de_macau_Photos",
+                    branch: "main"
+                };
+                const REPO_API_URL = `https://api.github.com/repos/${TARGET_REPO.user}/${TARGET_REPO.repo}/contents/`;
+                const RAW_BASE_URL = `https://raw.githubusercontent.com/${TARGET_REPO.user}/${TARGET_REPO.repo}/${TARGET_REPO.branch}`;
+
+                const allFiles = await fetchAllRepoFiles(REPO_API_URL);
+                const imageFiles = allFiles.filter(file => /\.(jpg|jpeg|png|webp|gif|bmp)$/i.test(file.name));
+                const imageUrls = imageFiles.map(file => `${RAW_BASE_URL}/${file.path}`).slice(0, selectedNum);
+
+                if (imageUrls.length === 0) throw new Error('未获取到图片列表');
+
+                // 批量缓存图片并设置时效
+                let successCount = 0;
+                for (const url of imageUrls) {
+                    const response = await fetch(url);
+                    const blob = await response.blob();
+                    // 传入时效（天）
+                    await cacheSingleImageWithExpire(url, blob, selectedDays);
+                    successCount++;
+                }
+
+                downloadStatus.textContent = `成功缓存 ${successCount}/${selectedNum} 张图片，缓存包已生成（时效：${selectedDays === 0 ? '永久' : selectedDays + '天'}）`;
+            } catch (error) {
+                downloadStatus.textContent = `缓存失败：${error.message}`;
+            } finally {
+                downloadBtn.disabled = false;
+            }
+        });
+
+        // 递归获取仓库文件
+        async function fetchAllRepoFiles(apiUrl, path = "") {
+            const response = await fetch(`${apiUrl}${path}`);
+            if (response.status === 403) throw new Error('GitHub API限流，请稍后重试');
+            if (!response.ok) throw new Error(`请求失败 (${response.status})`);
+            const files = await response.json();
+            let allFiles = [];
+            for (const file of files) {
+                if (file.type === "dir") {
+                    const subFiles = await fetchAllRepoFiles(apiUrl, file.path);
+                    allFiles = [...allFiles, ...subFiles];
+                } else {
+                    allFiles.push(file);
+                }
+            }
+            return allFiles;
+        }
+    </script>
+</body>
+</html>
