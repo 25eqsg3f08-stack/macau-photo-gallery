@@ -5,7 +5,8 @@ const PAGE_CACHE_RESOURCES = [
     "/macau-photo-gallery/index.html", 
     "/macau-photo-gallery/css/style.css",
     "/macau-photo-gallery/js/storage.js",
-    "/macau-photo-gallery/js/main.js"
+    "/macau-photo-gallery/js/main.js",
+ "/macau-photo-gallery/cache_dw.html"
 ];
 
 // 安装：缓存核心资源（含HTML）
