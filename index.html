@@ -4,18 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>澳门街道离线图片浏览器</title>
-    <meta name="description" content="跨仓库加载图片，支持自定义缓存数量、精准清除图片缓存">
+    <meta name="description" content="跨仓库加载图片，支持缓存包下载、自定义缓存数量与时效">
     <link rel="stylesheet" href="/macau-photo-gallery/css/style.css">
-    <!-- 注册 Service Worker 实现离线（修正路径+添加作用域） -->
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', async () => {
                 try {
-                    // 关键：SW文件路径和作用域都要匹配子目录
                     const swReg = await navigator.serviceWorker.register('/macau-photo-gallery/sw.js', {
-                        scope: '/macau-photo-gallery/' // 作用域必须覆盖项目路径
+                        scope: '/macau-photo-gallery/'
                     });
-                    console.log('Service Worker 注册成功 → 离线模式已启用', swReg);
+                    console.log('Service Worker 注册成功', swReg);
                 } catch (error) {
                     console.error('Service Worker 注册失败:', error);
                 }
@@ -23,7 +21,6 @@
         }
     </script>
     <style>
-        /* 新增：网络状态提示样式 */
         .network-status {
             position: fixed;
             top: 0;
@@ -34,31 +31,35 @@
             font-weight: bold;
             z-index: 9999;
         }
-        .online {
-            background-color: #4CAF50;
-            color: white;
+        .online { background-color: #4CAF50; color: white; }
+        .offline { background-color: #f44336; color: white; }
+        .container { margin-top: 40px; }
+        .cache-link {
+            text-align: center;
+            margin: 20px 0;
         }
-        .offline {
-            background-color: #f44336;
+        .cache-link a {
+            padding: 10px 20px;
+            background-color: #2196F3;
             color: white;
-        }
-        /* 给容器加顶部边距，避免被状态条遮挡 */
-        .container {
-            margin-top: 40px;
+            text-decoration: none;
+            border-radius: 6px;
         }
     </style>
 </head>
 <body>
-    <!-- 新增：实时网络状态提示条 -->
     <div id="network-status-bar" class="network-status online">当前网络：在线</div>
-
     <div class="container">
         <header class="header">
             <h1>澳门街道离线图片浏览器</h1>
-            <p>图片源: <a href="https://github.com/25eqsg3f08-stack/Rua_de_macau_Photos" target="_blank">Rua_de_macau_Photos</a> | 缓存隔离: 仅清理图片</p>
+            <p>图片源: <a href="https://github.com/25eqsg3f08-stack/Rua_de_macau_Photos" target="_blank">Rua_de_macau_Photos</a> | 支持缓存包下载</p>
         </header>
 
-        <!-- 图片显示区 -->
+        <!-- 跳转缓存包下载页面入口 -->
+        <div class="cache-link">
+            <a href="/macau-photo-gallery/cache_dw.html">前往缓存包下载设置</a>
+        </div>
+
         <div class="image-container">
             <img id="current-image" src="https://via.placeholder.com/1200x600?text=加载中..." alt="澳门街道图片" class="street-image">
             <div class="image-info">
@@ -67,28 +68,19 @@
             </div>
         </div>
 
-        <!-- 翻页控制 -->
         <div class="control-buttons">
             <button id="prev-btn" class="btn" disabled>上一页</button>
             <button id="next-btn" class="btn" disabled>下一页</button>
         </div>
 
-        <!-- 缓存控制区（核心：自定义数量 + 精准清除） -->
         <div class="cache-settings">
-            <h3>离线缓存控制</h3>
-            <div class="cache-option">
-                <label for="cache-count">设置缓存图片数量:</label>
-                <input type="number" id="cache-count" min="1" max="500" value="20" placeholder="输入1-500的数字">
-            </div>
-            <button id="cache-btn" class="btn btn-primary">开始缓存指定数量图片</button>
-            <button id="clear-img-cache-btn" class="btn btn-danger">仅清除图片缓存（保留网页）</button>
+            <h3>基础缓存控制</h3>
             <p id="cache-status">缓存状态: 未初始化</p>
             <p id="cache-size">当前图片缓存大小: 0MB (0GB)</p>
         </div>
     </div>
 
     <script>
-        // 新增：实时检测网络状态
         const statusBar = document.getElementById('network-status-bar');
         function updateNetworkStatus() {
             if (navigator.onLine) {
@@ -99,9 +91,7 @@
                 statusBar.className = 'network-status offline';
             }
         }
-        // 初始化状态
         updateNetworkStatus();
-        // 监听网络变化
         window.addEventListener('online', updateNetworkStatus);
         window.addEventListener('offline', updateNetworkStatus);
     </script>
