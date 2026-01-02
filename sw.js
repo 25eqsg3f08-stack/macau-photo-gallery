@@ -1,4 +1,4 @@
-const PAGE_CACHE_NAME = "MacauStreet_PageCache_v2.3";
+const PAGE_CACHE_NAME = "MacauStreet_PageCache_v2.3.1";
 // 新增 index.html 到核心缓存列表，确保页面本身能离线访问
 const PAGE_CACHE_RESOURCES = [
     "/macau-photo-gallery/",
